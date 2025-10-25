@@ -1,8 +1,8 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 
-	import 'leaflet/dist/leaflet.css';
-	import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+	import '$lib/leaflet/dist/leaflet.css';
+	import '$lib/leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 	let mapContainer;
 	let map;
