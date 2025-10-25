@@ -55,7 +55,7 @@
 				(err) => {
 					console.warn(`Could not get location: ${err.message}`);
 					if (!map) {
-						userLocation = [51.505, -0.09]; // London Fallback
+						userLocation = [13.75989540594988, 100.49439405345782]; // London Fallback
 						initMap(userLocation, 10);
 						L.marker(userLocation).addTo(map).bindPopup('Fallback Location');
 					}
