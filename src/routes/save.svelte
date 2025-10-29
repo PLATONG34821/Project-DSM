@@ -1,8 +1,8 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 
-	import 'leaflet/dist/leaflet.css';
-	import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+	import '$lib/leaflet/dist/leaflet.css';
+	import '$lib/leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 	let mapContainer;
 	let map;
@@ -55,7 +55,7 @@
 				(err) => {
 					console.warn(`Could not get location: ${err.message}`);
 					if (!map) {
-						userLocation = [51.505, -0.09]; // London Fallback
+						userLocation = [13.75989540594988, 100.49439405345782]; // London Fallback
 						initMap(userLocation, 10);
 						L.marker(userLocation).addTo(map).bindPopup('Fallback Location');
 					}
@@ -92,6 +92,88 @@
 			attribution:
 				'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 		}).addTo(map);
+
+		// --- NEW ---
+		// Call the function to load and display data pins 📍
+		loadDataPins();
+	}
+
+	// --- NEW: Function to load and plot data from CSV ---
+	async function loadDataPins() {
+		if (!map || !L) return; // Make sure map and Leaflet are ready
+
+		const csvUrl =
+			'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo00v_Jl9XeD5piLhChE-vW0boIHAPua61YTltj-u7SHA8CTYz08ws8uEKerWe3Q-rhE0vnb8Uo706/pub?gid=0&single=true&output=csv';
+
+		try {
+			const response = await fetch(csvUrl);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch: ${response.statusText}`);
+			}
+			const csvText = await response.text();
+
+			// --- Simple CSV Parsing ---
+			const rows = csvText
+				.split('\n')
+				.map((row) => row.trim())
+				.filter(Boolean); // Split by line, trim, remove empty lines
+
+			if (rows.length < 2) {
+				console.warn('No data rows found in CSV.');
+				return; // No data or only header
+			}
+
+			const headers = rows.shift().split(','); // Get header row
+
+			// Find column indices
+			const latIndex = headers.indexOf('latitude');
+			const lngIndex = headers.indexOf('longitude');
+			const nameIndex = headers.indexOf('accident');
+			const locationIndex = headers.indexOf('location');
+			const diedIndex = headers.indexOf('died');
+			const dayIndex = headers.indexOf('day');
+			const monthIndex = headers.indexOf('month');
+			const yearIndex = headers.indexOf('year');
+			const dangerIndex = headers.indexOf('danger');
+
+			if (latIndex === -1 || lngIndex === -1) {
+				console.error("CSV must have 'latitude' and 'longitude' columns.");
+				return;
+			}
+
+			// Create a layer group to hold all the new pins
+			const pinLayerGroup = L.layerGroup().addTo(map);
+
+			// --- Loop and Create Markers ---
+			for (const row of rows) {
+				// Note: This is a simple parser. It will break if your 'description'
+				// or 'name' fields contain a comma.
+				const values = row.split(',');
+
+				const lat = parseFloat(values[latIndex]);
+				const lng = parseFloat(values[lngIndex]);
+
+				// Check for valid coordinates
+				if (!isNaN(lat) && !isNaN(lng)) {
+					const name = values[nameIndex] || 'No Data';
+					const location = values[locationIndex] || 'No Data';
+					const dateDay = values[dayIndex] || 'No Data';
+					const dateMonth = values[monthIndex] || 'No Data';
+					const dateYear = values[yearIndex] || 'No Data';
+					const danger_level = values[dangerIndex] || 'No Data';
+
+					// Create the popup content
+					const popupContent = `<b>${name}</b><br>${location}<br>วันที่: ${dateDay}/${dateMonth}/${dateYear}<br>ระดับความอันตราย: ${danger_level}`;
+
+					// Create marker, add to group, and bind the popup
+					L.marker([lat, lng]).addTo(pinLayerGroup).bindPopup(popupContent);
+				}
+			}
+
+			console.log('Successfully loaded all data pins! 🥳');
+		} catch (error) {
+			console.error('Failed to load data pins:', error);
+		}
 	}
 
 	// --- Button Handlers ---
@@ -116,29 +198,15 @@
 		routingControl = L.Routing.control({
 			waypoints: [L.latLng(userLocation[0], userLocation[1]), destination],
 			routeWhileDragging: true,
-			// We removed 'addWaypoints: false' to let createMarker run
 			show: false, // Keep hiding the text panel
-
-			// --- THIS IS THE NEW PART ---
 			createMarker: function (i, waypoint, n) {
-				// 'i' is the waypoint index (0 = start, n-1 = end)
-
 				if (i === 0) {
-					// This is the start waypoint (index 0).
-					// Return null to draw NO marker, since we already
-					// have our blue dot.
 					return null;
 				}
-
 				if (i === n - 1) {
-					// This is the end waypoint.
-					// Create a standard marker and store a reference to it
-					// so we can remove it in handleCancel.
 					destinationMarker = L.marker(waypoint.latLng);
 					return destinationMarker;
 				}
-
-				// This would be for any middle waypoints (if you had them)
 				return L.marker(waypoint.latLng);
 			}
 		}).addTo(map);
@@ -162,9 +230,7 @@
 		destination = null;
 		state = 'initial';
 	}
-	/**
-	 * NEW FUNCTION: Pans the map back to the user's location
-	 */
+
 	function panToUser() {
 		if (map && userLocation) {
 			// Use setView for a smooth pan and zoom

@@ -129,7 +129,12 @@
 			const latIndex = headers.indexOf('latitude');
 			const lngIndex = headers.indexOf('longitude');
 			const nameIndex = headers.indexOf('accident');
-			const descIndex = headers.indexOf('location');
+			const locationIndex = headers.indexOf('location');
+			const diedIndex = headers.indexOf('died');
+			const dayIndex = headers.indexOf('day');
+			const monthIndex = headers.indexOf('month');
+			const yearIndex = headers.indexOf('year');
+			const dangerIndex = headers.indexOf('danger');
 
 			if (latIndex === -1 || lngIndex === -1) {
 				console.error("CSV must have 'latitude' and 'longitude' columns.");
@@ -150,11 +155,15 @@
 
 				// Check for valid coordinates
 				if (!isNaN(lat) && !isNaN(lng)) {
-					const name = values[nameIndex] || 'No Name';
-					const description = values[descIndex] || 'No Description';
+					const name = values[nameIndex] || 'No Data';
+					const location = values[locationIndex] || 'No Data';
+					const dateDay = values[dayIndex] || 'No Data';
+					const dateMonth = values[monthIndex] || 'No Data';
+					const dateYear = values[yearIndex] || 'No Data';
+					const danger_level = values[dangerIndex] || 'No Data';
 
 					// Create the popup content
-					const popupContent = `<b>${name}</b><br>${description}`;
+					const popupContent = `<b>${name}</b><br>${location}<br>วันที่: ${dateDay}/${dateMonth}/${dateYear}<br>ระดับความอันตราย: ${danger_level}`;
 
 					// Create marker, add to group, and bind the popup
 					L.marker([lat, lng]).addTo(pinLayerGroup).bindPopup(popupContent);
