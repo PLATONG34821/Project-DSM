@@ -28,12 +28,4 @@ start the app to test the map data and gps alerts on your own machine:
 ```bash
 npm run dev
 ```
-
-## build for production
-
-when your app is ready to help real drivers, build it for the web:
-
-```bash
-npm run build
-npm run preview
-```
+ 
