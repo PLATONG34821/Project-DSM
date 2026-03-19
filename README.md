@@ -1,38 +1,39 @@
-# sv
+# project-dsm 
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+project-dsm is a smart road safety application designed to keep drivers and passengers safe on every journey. 
 
-## Creating a project
+using real-time map data and user reports, the app alerts you about dangerous roads, accident-prone areas, and ongoing hazards ahead. with gps-based notifications and a community-driven safety network, this project helps prevent accidents before they happen — making every trip safer, smarter, and stress-free.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## core features
 
-```sh
-# create a new project in the current directory
-npx sv create
+* real-time map data: view live road conditions and hazards.
+* community user reports: drivers can report and see accident-prone areas.
+* gps-based notifications: get alerted when approaching danger.
+* smart safety network: a stress-free experience for everyone on the road.
 
-# create a new project in my-app
-npx sv create my-app
+## install the app
+
+download the repository and install the required packages to run the safety network locally:
+
+```bash
+git clone [https://github.com/platong34821/project-dsm.git](https://github.com/platong34821/project-dsm.git)
+cd project-dsm
+npm install
 ```
 
-## Developing
+## run the development server
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+start the app to test the map data and gps alerts on your own machine:
 
-```sh
+```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+## build for production
 
-To create a production version of your app:
+when your app is ready to help real drivers, build it for the web:
 
-```sh
+```bash
 npm run build
+npm run preview
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
